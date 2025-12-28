@@ -16,12 +16,17 @@ const DB_HOST = process.env.DB_HOST || 'localhost';
 const DB_USER = process.env.DB_USER || 'root';
 const DB_PASSWORD = process.env.DB_PASSWORD || 'root';
 const DB_NAME = process.env.DB_NAME || 'restoran_db';
+const DB_PORT = process.env.DB_PORT || 3306;
+
+console.log('Veritabani baglantisi deneniyor:', DB_HOST, DB_PORT);
 
 const db = mysql.createConnection({
     host: DB_HOST,
+    port: DB_PORT,
     user: DB_USER,
     password: DB_PASSWORD,
-    database: DB_NAME
+    database: DB_NAME,
+    connectTimeout: 30000
 });
 
 db.connect((err) => {
@@ -35,8 +40,15 @@ db.connect((err) => {
 
 const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
     host: DB_HOST,
+    port: DB_PORT,
     dialect: 'mysql',
-    logging: false
+    logging: false,
+    dialectOptions: {
+        connectTimeout: 30000
+    },
+    retry: {
+        max: 5
+    }
 });
 
 
