@@ -248,9 +248,7 @@ input::placeholder,textarea::placeholder{
   white-space: nowrap;   
 }
 
-/* --- YENİ EKLENEN MUTFAK TASARIMI --- */
-
-/* Mutfak Kolon Başlıkları */
+/* --- YENİ EKLENEN MUTFAK VE GARSON TASARIMLARI --- */
 .k-header {
   padding: 12px;
   border-radius: 8px 8px 0 0;
@@ -267,7 +265,6 @@ input::placeholder,textarea::placeholder{
 .kh-orange { background: linear-gradient(45deg, #7c2d12, #f97316); color: white; }
 .kh-green { background: linear-gradient(45deg, #14532d, #22c55e); color: white; }
 
-/* Mutfak Sipariş Kartı */
 .k-card {
   background: #1f2937;
   border: 1px solid #374151;
@@ -285,12 +282,10 @@ input::placeholder,textarea::placeholder{
   box-shadow: 0 10px 15px rgba(0,0,0,0.5);
 }
 
-/* Duruma Göre Kart Renkleri */
 .kc-red { border-left-color: #ef4444; }
 .kc-orange { border-left-color: #f97316; }
 .kc-green { border-left-color: #22c55e; }
 
-/* Kart İçeriği */
 .k-info {
   display: flex;
   justify-content: space-between;
@@ -302,28 +297,15 @@ input::placeholder,textarea::placeholder{
 
 .k-masa { font-weight: bold; font-size: 1.1rem; color: #fff; }
 .k-saat { font-size: 0.8rem; color: #9ca3af; font-family: monospace; }
+.k-urunler { font-size: 0.9rem; color: #e5e7eb; line-height: 1.5; }
+.k-actions { margin-top: 10px; display: flex; justify-content: flex-end; gap: 5px; }
 
-.k-urunler {
-  font-size: 0.9rem;
-  color: #e5e7eb;
-  line-height: 1.5;
-}
-
-.k-actions {
-  margin-top: 10px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 5px;
-}
-
-/* Ufak Animasyon */
 @keyframes slideIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-slide { animation: slideIn 0.3s ease-out forwards; }
 
-/* --- GARSON EKRANI İÇİN YENİ KART TASARIMI --- */
 .garson-siparis-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -332,8 +314,8 @@ input::placeholder,textarea::placeholder{
 }
 
 .garson-card {
-    background: #1b1009; /* Panel rengi */
-    border: 1px solid #22c55e; /* Yeşil çerçeve (Hazır) */
+    background: #1b1009; 
+    border: 1px solid #22c55e;
     border-radius: 12px;
     padding: 15px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
@@ -371,4 +353,105 @@ input::placeholder,textarea::placeholder{
     border-radius: 4px;
     font-size: 0.75rem;
     font-weight: bold;
+}
+
+/* --- YENİ EKLENEN KREDİ KARTI STİLLERİ --- */
+.credit-card-box {
+  width: 100%;
+  max-width: 400px;
+  height: 200px;
+  margin: 0 auto 25px;
+  background: linear-gradient(135deg, #4c1d95 0%, #2563eb 100%);
+  border-radius: 15px;
+  padding: 20px;
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  position: relative;
+  overflow: hidden;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.credit-card-box .chip {
+  width: 50px;
+  height: 35px;
+  background: linear-gradient(135deg, #fcd34d 0%, #d97706 100%);
+  border-radius: 6px;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.credit-card-box .chip::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(0,0,0,0.2);
+}
+
+.credit-card-box .chip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  background: rgba(0,0,0,0.2);
+}
+
+.credit-card-box .card-number {
+  font-size: 1.4rem;
+  letter-spacing: 2px;
+  margin-bottom: 25px;
+  text-shadow: 0 2px 2px rgba(0,0,0,0.3);
+}
+
+.credit-card-box .card-holder {
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.credit-card-box .card-expires {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  text-align: right;
+}
+
+.credit-card-box label {
+  font-size: 0.65rem;
+  display: block;
+  opacity: 0.7;
+  margin-bottom: 2px;
+}
+
+/* Modal Input İyileştirmeleri */
+.input-group-text-dark {
+  background-color: #1f2937;
+  border: 1px solid #4b5563;
+  color: #9ca3af;
+  border-right: none;
+}
+
+.form-control-dark {
+  background-color: #1f2937 !important;
+  border: 1px solid #4b5563 !important;
+  border-left: none !important;
+  color: #fff !important;
+  transition: border-color 0.2s;
+}
+
+.form-control-dark:focus {
+  box-shadow: none;
+  border-color: #f97316 !important;
+}
+
+.form-control-dark::placeholder {
+  color: #6b7280;
+}
+
+/* Input grubu focus olduğunda icon border'ını da boya */
+.input-group:focus-within .input-group-text-dark {
+  border-color: #f97316;
 }

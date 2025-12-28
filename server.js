@@ -2,26 +2,20 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const mysql = require('mysql2');
-const { Sequelize, DataTypes } = require('sequelize'); // Sequelize eklendi
+const { Sequelize, DataTypes } = require('sequelize');
 
-app.use(express.json());
+app.use(express.json()); 
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- ENVIRONMENT VARIABLES ---
-const DB_HOST = process.env.DB_HOST || 'localhost';
-const DB_USER = process.env.DB_USER || 'root';
-const DB_PASSWORD = process.env.DB_PASSWORD || '';
-const DB_NAME = process.env.DB_NAME || 'restaurant_db';
 
-// --- MEVCUT MYSQL BAĞLANTISI (Kullanıcılar ve Rezervasyonlar için) ---
 const db = mysql.createConnection({
-    host: DB_HOST,
-    user: DB_USER,
-    password: DB_PASSWORD,
-    database: DB_NAME
+    host: 'localhost',
+    user: 'root',      
+    password: 'root',      
+    database: 'restoran_db' 
 });
 
 db.connect((err) => {
@@ -32,48 +26,46 @@ db.connect((err) => {
     }
 });
 
-// --- SEQUELIZE BAĞLANTISI (Sipariş Yönetimi için) ---
-const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
-    host: DB_HOST,
+
+const sequelize = new Sequelize('restoran_db', 'root', 'root', {
+    host: 'localhost',
     dialect: 'mysql',
-    logging: false // Konsol kirliliğini önlemek için
+    logging: false
 });
 
-// Sipariş Modeli (Tablo)
+
 const Siparis = sequelize.define('Siparis', {
     masa: {
         type: DataTypes.STRING,
         allowNull: false
     },
     icerik: {
-        type: DataTypes.JSON, // Sipariş içeriğini JSON olarak tutacağız
+        type: DataTypes.JSON,
         allowNull: false
     },
     durum: {
         type: DataTypes.STRING,
-        defaultValue: 'bekleyen' // bekleyen -> hazirlaniyor -> tamamlandi -> servis_edildi
+        defaultValue: 'bekleyen'
     }
 }, {
     tableName: 'siparisler',
     timestamps: true
 });
 
-// Veritabanını Senkronize Et (Tablo yoksa oluşturur)
 sequelize.sync().then(() => {
     console.log("Sequelize: Siparişler tablosu hazır.");
 }).catch(err => console.error("Sequelize Hatası:", err));
 
 
-// Ürün Verileri
 const Urunler = [
-    { id: 'u1', name: 'Islak Hamburger', price: 135, stok: 50 },
-    { id: 'u2', name: 'Köfte Hamburger', price: 175, stok: 50 },
-    { id: 'u3', name: 'Tavuk Hamburger', price: 120, stok: 50 },
-    { id: 'u4', name: 'Tereyağlı Hamburger', price: 130, stok: 50 },
-    { id: 'u6', name: 'Sucuklu Pizza ', price: 210, stok: 50 },
-    { id: 'u7', name: 'Karışık Pizza ', price: 260, stok: 50 },
-    { id: 'u8', name: 'Pastırmalı Pizza ', price: 230, stok: 50 },
-    { id: 'u9', name: 'Mantarlı Pizza ', price: 240, stok: 50 },
+    { id: 'u1',  name: 'Islak Hamburger', price: 135, stok: 50 },
+    { id: 'u2',  name: 'Köfte Hamburger', price: 175, stok: 50 },
+    { id: 'u3',  name: 'Tavuk Hamburger', price: 120, stok: 50 }, 
+    { id: 'u4',  name: 'Tereyağlı Hamburger', price: 130, stok: 50 },
+    { id: 'u6',  name: 'Sucuklu Pizza ', price: 210, stok: 50 },
+    { id: 'u7',  name: 'Karışık Pizza ', price: 260, stok: 50 }, 
+    { id: 'u8',  name: 'Pastırmalı Pizza ', price: 230, stok: 50 },
+    { id: 'u9',  name: 'Mantarlı Pizza ', price: 240, stok: 50 },
     { id: 'u11', name: 'Patates Kızartması (Orta)', price: 65, stok: 50 },
     { id: 'u12', name: 'Patates Kızartması (Büyük)', price: 80, stok: 50 },
     { id: 'u13', name: 'Soğan Halkası (8\'li)', price: 75, stok: 50 },
@@ -100,11 +92,12 @@ const Menuler = [
 
 
 app.get('/', (req, res) => {
-    res.render('index', {
+    res.render('index', { 
         urunler: Urunler,
         menuler: Menuler
     });
 });
+
 
 
 app.post('/api/kayit', (req, res) => {
@@ -122,7 +115,6 @@ app.post('/api/kayit', (req, res) => {
     });
 });
 
-
 app.post('/api/giris', (req, res) => {
     const { kadi, sifre, rol } = req.body;
     const sql = "SELECT * FROM kullanicilar WHERE ad_soyad = ? AND sifre = ? AND rol = ?";
@@ -138,7 +130,6 @@ app.post('/api/giris', (req, res) => {
     });
 });
 
-// --- YENİ SİPARİŞ API'Sİ (Sequelize ile) ---
 app.post('/api/siparis-ver', async (req, res) => {
     const { sepet, masa } = req.body;
 
@@ -147,7 +138,6 @@ app.post('/api/siparis-ver', async (req, res) => {
     }
 
     try {
-        // 1. Stokları düş (Bellekteki array'den)
         sepet.forEach(sepetUrunu => {
             const urun = Urunler.find(u => u.id === sepetUrunu.id);
             if (urun && urun.stok >= sepetUrunu.adet) {
@@ -155,10 +145,9 @@ app.post('/api/siparis-ver', async (req, res) => {
             }
         });
 
-        // 2. Siparişi Veritabanına Kaydet (Sequelize)
         await Siparis.create({
             masa: masa,
-            icerik: sepet, // JSON formatında kaydeder
+            icerik: sepet, 
             durum: 'bekleyen'
         });
 
@@ -170,14 +159,9 @@ app.post('/api/siparis-ver', async (req, res) => {
     }
 });
 
-// --- MUTFAK API'LERİ ---
 
-// Tüm aktif siparişleri getir
 app.get('/api/mutfak/siparisler', async (req, res) => {
     try {
-        // 'servis_edildi' olmayan siparişleri getir (Mutfak ekranı için)
-        // Ancak Garson 'tamamlandi' olanları görecek.
-        // Mutfak sadece 'bekleyen', 'hazirlaniyor', 'tamamlandi' durumlarını görsün.
         const siparisler = await Siparis.findAll({
             order: [['createdAt', 'ASC']]
         });
@@ -187,7 +171,6 @@ app.get('/api/mutfak/siparisler', async (req, res) => {
     }
 });
 
-// Sipariş durumunu güncelle
 app.post('/api/mutfak/durum-guncelle', async (req, res) => {
     const { id, yeniDurum } = req.body;
     try {
@@ -198,38 +181,30 @@ app.post('/api/mutfak/durum-guncelle', async (req, res) => {
     }
 });
 
-// --- GARSON API'LERİ ---
 
-// Masa doluluk durumu (Siparişi olan masalar)
 app.get('/api/garson/masa-durumlari', async (req, res) => {
     try {
-        // Bekleyen veya hazırlanıyor veya tamamlandı durumundaki siparişlerin masalarını bul
         const aktifSiparisler = await Siparis.findAll({
             where: {
                 durum: ['bekleyen', 'hazirlaniyor', 'tamamlandi']
             },
             attributes: ['masa']
         });
-
-        // Benzersiz masa isimlerini al
         const doluMasalar = [...new Set(aktifSiparisler.map(s => s.masa))];
-
         res.json({ status: 'ok', doluMasalar: doluMasalar });
     } catch (error) {
         res.status(500).json({ status: 'error', mesaj: 'Hata' });
     }
 });
 
-// Misafir için son durumu kontrol et (Polling)
+
 app.get('/api/misafir/siparis-durumu', async (req, res) => {
     const { masa } = req.query;
     try {
-        // Bu masaya ait en son güncellenen siparişi bul
         const sonSiparis = await Siparis.findOne({
             where: { masa: masa },
             order: [['updatedAt', 'DESC']]
         });
-
         if (sonSiparis) {
             res.json({ status: 'ok', durum: sonSiparis.durum });
         } else {
@@ -240,8 +215,6 @@ app.get('/api/misafir/siparis-durumu', async (req, res) => {
     }
 });
 
-
-// --- REZERVASYON API (Mevcut) ---
 
 app.post('/api/rezervasyon-olustur', (req, res) => {
     const { ad, telefon, tarih, saat, masa } = req.body;
@@ -290,7 +263,88 @@ app.post('/api/rezervasyon-iptal', (req, res) => {
 });
 
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log("Server çalışıyor");
+const OdemeDurumlari = {};
+
+
+app.post('/api/odeme/iste', async (req, res) => {
+    const { masa } = req.body;
+    
+  
+    const siparisler = await Siparis.findAll({ where: { masa: masa } });
+    let toplamTutar = 0;
+
+    siparisler.forEach(sip => {
+        let icerik = sip.icerik; 
+        if(typeof icerik === 'string') icerik = JSON.parse(icerik); 
+        
+        if(Array.isArray(icerik)) {
+            icerik.forEach(urun => {
+                toplamTutar += (Number(urun.price) * Number(urun.adet));
+            });
+        }
+    });
+
+    toplamTutar = toplamTutar * 1.10;
+
+    
+    OdemeDurumlari[masa] = {
+        durum: 'istendi',
+        tutar: toplamTutar.toFixed(2)
+    };
+
+    res.json({ status: 'ok', mesaj: 'Hesap istendi, garson onayı bekleniyor.' });
+});
+
+
+app.get('/api/garson/odeme-istekleri', (req, res) => {
+    const istekler = [];
+    for (const [masa, veri] of Object.entries(OdemeDurumlari)) {
+        if (veri.durum === 'istendi') {
+            istekler.push({ masa: masa, tutar: veri.tutar });
+        }
+    }
+    res.json({ status: 'ok', data: istekler });
+});
+
+
+app.post('/api/garson/odeme-izin-ver', (req, res) => {
+    const { masa } = req.body;
+    if(OdemeDurumlari[masa]) {
+        OdemeDurumlari[masa].durum = 'odeme_modunda'; 
+        res.json({ status: 'ok', mesaj: 'Misafire ödeme ekranı açıldı.' });
+    } else {
+        res.json({ status: 'error', mesaj: 'İstek bulunamadı.' });
+    }
+});
+
+
+app.get('/api/misafir/odeme-durum-kontrol', (req, res) => {
+    const { masa } = req.query;
+    if(OdemeDurumlari[masa]) {
+        res.json({ status: 'ok', durum: OdemeDurumlari[masa].durum, tutar: OdemeDurumlari[masa].tutar });
+    } else {
+        res.json({ status: 'ok', durum: 'yok' });
+    }
+});
+
+
+app.post('/api/misafir/odeme-yap', async (req, res) => {
+    const { masa } = req.body;
+    try {
+       
+        await Siparis.destroy({ where: { masa: masa } });
+
+        
+        delete OdemeDurumlari[masa];
+
+        res.json({ status: 'ok', mesaj: 'Ödeme alındı, masa kapatıldı.' });
+    } catch (err) {
+        console.error(err);
+        res.json({ status: 'error', mesaj: 'Ödeme sırasında hata oluştu.' });
+    }
+});
+
+
+app.listen(3000, () => {
+    console.log('Sunucu çalışıyor: http://localhost:3000');
 });
