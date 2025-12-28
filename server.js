@@ -4,18 +4,24 @@ const path = require('path');
 const mysql = require('mysql2');
 const { Sequelize, DataTypes } = require('sequelize');
 
-app.use(express.json()); 
+app.use(express.json());
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+// --- ENVIRONMENT VARIABLES ---
+const DB_HOST = process.env.DB_HOST || 'localhost';
+const DB_USER = process.env.DB_USER || 'root';
+const DB_PASSWORD = process.env.DB_PASSWORD || 'root';
+const DB_NAME = process.env.DB_NAME || 'restoran_db';
+
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',      
-    password: 'root',      
-    database: 'restoran_db' 
+    host: DB_HOST,
+    user: DB_USER,
+    password: DB_PASSWORD,
+    database: DB_NAME
 });
 
 db.connect((err) => {
@@ -27,8 +33,8 @@ db.connect((err) => {
 });
 
 
-const sequelize = new Sequelize('restoran_db', 'root', 'root', {
-    host: 'localhost',
+const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+    host: DB_HOST,
     dialect: 'mysql',
     logging: false
 });
@@ -58,14 +64,14 @@ sequelize.sync().then(() => {
 
 
 const Urunler = [
-    { id: 'u1',  name: 'Islak Hamburger', price: 135, stok: 50 },
-    { id: 'u2',  name: 'Köfte Hamburger', price: 175, stok: 50 },
-    { id: 'u3',  name: 'Tavuk Hamburger', price: 120, stok: 50 }, 
-    { id: 'u4',  name: 'Tereyağlı Hamburger', price: 130, stok: 50 },
-    { id: 'u6',  name: 'Sucuklu Pizza ', price: 210, stok: 50 },
-    { id: 'u7',  name: 'Karışık Pizza ', price: 260, stok: 50 }, 
-    { id: 'u8',  name: 'Pastırmalı Pizza ', price: 230, stok: 50 },
-    { id: 'u9',  name: 'Mantarlı Pizza ', price: 240, stok: 50 },
+    { id: 'u1', name: 'Islak Hamburger', price: 135, stok: 50 },
+    { id: 'u2', name: 'Köfte Hamburger', price: 175, stok: 50 },
+    { id: 'u3', name: 'Tavuk Hamburger', price: 120, stok: 50 },
+    { id: 'u4', name: 'Tereyağlı Hamburger', price: 130, stok: 50 },
+    { id: 'u6', name: 'Sucuklu Pizza ', price: 210, stok: 50 },
+    { id: 'u7', name: 'Karışık Pizza ', price: 260, stok: 50 },
+    { id: 'u8', name: 'Pastırmalı Pizza ', price: 230, stok: 50 },
+    { id: 'u9', name: 'Mantarlı Pizza ', price: 240, stok: 50 },
     { id: 'u11', name: 'Patates Kızartması (Orta)', price: 65, stok: 50 },
     { id: 'u12', name: 'Patates Kızartması (Büyük)', price: 80, stok: 50 },
     { id: 'u13', name: 'Soğan Halkası (8\'li)', price: 75, stok: 50 },
@@ -92,7 +98,7 @@ const Menuler = [
 
 
 app.get('/', (req, res) => {
-    res.render('index', { 
+    res.render('index', {
         urunler: Urunler,
         menuler: Menuler
     });
@@ -147,7 +153,7 @@ app.post('/api/siparis-ver', async (req, res) => {
 
         await Siparis.create({
             masa: masa,
-            icerik: sepet, 
+            icerik: sepet,
             durum: 'bekleyen'
         });
 
@@ -268,16 +274,16 @@ const OdemeDurumlari = {};
 
 app.post('/api/odeme/iste', async (req, res) => {
     const { masa } = req.body;
-    
-  
+
+
     const siparisler = await Siparis.findAll({ where: { masa: masa } });
     let toplamTutar = 0;
 
     siparisler.forEach(sip => {
-        let icerik = sip.icerik; 
-        if(typeof icerik === 'string') icerik = JSON.parse(icerik); 
-        
-        if(Array.isArray(icerik)) {
+        let icerik = sip.icerik;
+        if (typeof icerik === 'string') icerik = JSON.parse(icerik);
+
+        if (Array.isArray(icerik)) {
             icerik.forEach(urun => {
                 toplamTutar += (Number(urun.price) * Number(urun.adet));
             });
@@ -286,7 +292,7 @@ app.post('/api/odeme/iste', async (req, res) => {
 
     toplamTutar = toplamTutar * 1.10;
 
-    
+
     OdemeDurumlari[masa] = {
         durum: 'istendi',
         tutar: toplamTutar.toFixed(2)
@@ -309,8 +315,8 @@ app.get('/api/garson/odeme-istekleri', (req, res) => {
 
 app.post('/api/garson/odeme-izin-ver', (req, res) => {
     const { masa } = req.body;
-    if(OdemeDurumlari[masa]) {
-        OdemeDurumlari[masa].durum = 'odeme_modunda'; 
+    if (OdemeDurumlari[masa]) {
+        OdemeDurumlari[masa].durum = 'odeme_modunda';
         res.json({ status: 'ok', mesaj: 'Misafire ödeme ekranı açıldı.' });
     } else {
         res.json({ status: 'error', mesaj: 'İstek bulunamadı.' });
@@ -320,7 +326,7 @@ app.post('/api/garson/odeme-izin-ver', (req, res) => {
 
 app.get('/api/misafir/odeme-durum-kontrol', (req, res) => {
     const { masa } = req.query;
-    if(OdemeDurumlari[masa]) {
+    if (OdemeDurumlari[masa]) {
         res.json({ status: 'ok', durum: OdemeDurumlari[masa].durum, tutar: OdemeDurumlari[masa].tutar });
     } else {
         res.json({ status: 'ok', durum: 'yok' });
@@ -331,10 +337,10 @@ app.get('/api/misafir/odeme-durum-kontrol', (req, res) => {
 app.post('/api/misafir/odeme-yap', async (req, res) => {
     const { masa } = req.body;
     try {
-       
+
         await Siparis.destroy({ where: { masa: masa } });
 
-        
+
         delete OdemeDurumlari[masa];
 
         res.json({ status: 'ok', mesaj: 'Ödeme alındı, masa kapatıldı.' });
