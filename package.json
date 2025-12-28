@@ -1,0 +1,16 @@
+{
+  "name": "restoran-ejs",
+  "version": "1.0.0",
+  "description": "Restoran Projesi",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.22.1",
+    "express-session": "^1.18.2",
+    "mysql2": "^3.15.3",
+    "sequelize": "^6.37.7"
+  }
+}

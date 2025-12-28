@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="tr" data-bs-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LEZZET HATTI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/proje.css"/>
+</head>
+<body>
+
+<script>
+    window.Urunler = <%- (typeof urunler !== 'undefined') ? JSON.stringify(urunler) : '[]' %>;
+    window.Menuler = <%- (typeof menuler !== 'undefined') ? JSON.stringify(menuler) : '[]' %>;
+    window.AktifRol = "<%= (typeof aktifRol !== 'undefined' && aktifRol) ? aktifRol : '' %>";
+</script>
+
+<div id="girisEkrani" style="display:flex;">
+  <div class="login-inner">
+    <div style="grid-column:1 / -1; text-align:center; margin-bottom:12px;">
+      <img src="logo.jpg" id="logo" alt="LezzetHattı Logo"
+           style="width:72px; height:72px; border-radius:16px; box-shadow:0 8px 22px rgba(0,0,0,.6); object-fit:cover;">
+      <h1 style="margin-top:8px; font-size:2.2rem; font-weight:700; color:#f9fafb; text-shadow:0 0 16px rgba(0,0,0,.8);">
+        LezzetHattı
+      </h1>
+    </div>
+
+    <div class="login-card">
+      <div class="badge-soft"><span>●</span> Kayıt Ekranı</div>
+      <div class="login-title">Kayıt Ol</div>
+      <div class="login-sub">Buradan kayıt yaparak bilgilerinizi saklayabilirsiniz.</div>
+      <ul class="login-sub" style="padding-left:18px;margin:6px 0">
+        <li>Ad-Soyad</li>
+        <li>E-Mail</li>
+        <li>Şifre</li>
+        <li>Giriş Rolü Seçimi</li>
+      </ul>
+      <div class="login-actions">
+        <button class="btn red" id="kayitButonu">Kayıt için devam et</button>
+      </div>
+    </div>
+
+    <div class="login-card">
+      <div class="badge-soft"><span>●</span> Hızlı giriş</div>
+      <div class="login-title">Misafir Girişi</div>
+      <div class="login-sub">Misafir menüyü inceler, sipariş ve rezervasyon oluşturur.</div>
+      <ul class="login-sub" style="padding-left:18px;margin:6px 0">
+        <li>Masada / Gel-al / Paket siparişi</li>
+        <li>Ödeme tipi seçimi</li>
+        <li>Rezervasyon oluşturma</li>
+      </ul>
+      <div class="login-actions">
+        <button class="btn orange" id="misafirGirisButonu">Misafir olarak devam et</button>
+      </div>
+    </div>
+
+    <div class="login-card">
+      <div class="badge-soft"><span>★</span> Personel girişi</div>
+      <div class="login-title">Personel Girişi</div>
+      <div class="login-sub">Garson sipariş ve ödeme alır. Mutfak siparişlere göre yemekleri pişirir.</div>
+      <ul class="login-sub" style="padding-left:18px;margin:6px 0">
+        <li>Mutfak sipariş ekranı</li>
+        <li>Masa yönetimi & rezervasyon takibi</li>
+        <li>Garson sipariş girişi ve ödeme</li>
+      </ul>
+      <div class="login-actions">
+        <select id="personelRolSecimi">
+          <option value="Mutfak">Mutfak</option>
+          <option value="Garson">Garson / Kasa</option>
+        </select>
+        <button class="btn red" id="garsonGirisButonu">Personel olarak devam et</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="kayitEkrani" style="display:none; min-height:100vh; padding:18px; align-items:center; justify-content:center;">
+  <div class="login-card" style="max-width:420px; width:100%;">
+    <div class="badge-soft"><span>●</span> Yeni Kullanıcı Kaydı</div>
+    <div class="login-title">Kayıt Ol</div>
+    <div class="row" style="flex-direction:column; gap:10px;">
+      <input id="kayitAd" type="text" placeholder="Ad Soyad">
+      <input id="kayitMail" type="email" placeholder="E-mail">
+      <input id="kayitSifre" type="password" placeholder="Şifre">
+      <select id="kayitRol">
+        <option value="">Rolünüzü Seçiniz</option>
+        <option value="Misafir">Misafir</option>
+        <option value="Garson">Garson</option>
+        <option value="Mutfak">Mutfak</option>
+      </select>
+    </div>
+    <div class="login-actions" style="margin-top:14px; display:flex; gap:10px;">
+      <button class="btn blue" id="kayitOlButonu">Kayıt Ol</button>
+      <button class="btn" id="kayitGeriButonu">Geri Dön</button>
+    </div>
+  </div>
+</div>
+
+<div class="app" id="uygulamaKok">
+  
+  <div class="bar">
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <span class="pill">Aktif Rol: <span id="rolEtiketi"></span></span>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="btn" id="cikisButonu">Çıkış</button>
+    </div>
+  </div>
+
+  <section id="misafir" class="grid g3" style="margin-top:14px;">
+    <div class="panel">
+      <div class="sticky"><h3>Menü Paketleri</h3></div>
+      <div class="list" id="kategoriListesi">
+        <% menuler.forEach(function(menu) { %>
+            <div class="row">
+              <div>
+                <div><b><%= menu.name %></b>
+                  <div class="muted"><%= menu.price %> ₺</div>
+                </div>
+              </div>
+              <div>
+                <button class="btn orange" onclick="sepetEkle('<%= menu.id %>')">+</button>
+                <button class="btn red" onclick="sepetCikar('<%= menu.id %>')">-</button>
+              </div>
+            </div>
+        <% }); %>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="sticky">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+          <h3>Ürünler</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <select id="misafirModu">
+              <option value="dinein">Masada</option>
+              <option value="pickup">Gel-Al</option>
+              <option value="delivery">Paket</option>
+            </select>
+            <select id="misafirMasa">
+                <option value="Masa 1">Masa 1</option>
+                <option value="Masa 2">Masa 2</option>
+                <option value="Masa 3">Masa 3</option>
+                <option value="Masa 4">Masa 4</option>
+                <option value="Masa 5">Masa 5</option>
+                <option value="Masa 6">Masa 6</option>
+                <option value="Masa 7">Masa 7</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="list" id="urunListesi">
+        <% urunler.forEach(function(urun) { %>
+            <div class="row">
+                <div>
+                    <b><%= urun.name %></b>
+                    <div class="muted">
+                        <%= urun.price %> ₺ 
+                        <span style="font-size:0.8em; color: orange;">(Kalan: <%= urun.stok %>)</span>
+                    </div>
+                </div>
+                <div>
+                    <% if (urun.stok > 0) { %>
+                        <button class="btn orange" onclick="sepetEkle('<%= urun.id %>')">+</button>
+                        <button class="btn red" onclick="sepetCikar('<%= urun.id %>')">-</button>
+                    <% } else { %>
+                        <button class="btn" style="background-color: #555; cursor: not-allowed;" disabled>TÜKENDİ</button>
+                    <% } %>
+                </div>
+            </div>
+        <% }); %>
+      </div>
+    </div>
+      
+    <div class="panel">
+      <div class="sticky"><h3>Sepet & Ödeme</h3></div>
+      <h3>Sepet</h3>
+      <div class="list" id="sepetListesi"></div>
+      <div class="hr"></div>
+      
+      <div id="teslimatAlanlari" style="display:none">
+        <div class="row"><input id="gAd" placeholder="İsim"/><input id="gTelefon" placeholder="Telefon"/></div>
+        <div class="row"><textarea id="gAdres" rows="2" placeholder="Adres"></textarea></div>
+      </div>
+      
+      <div class="row">
+        <h3>Ödeme</h3>
+        <span>Ödeme Yöntemleri</span>
+        <select id="gOdeme">
+          <option value="online">Online</option>
+          <option value="pos">POS</option>
+          <option value="cash">Nakit</option>
+        </select>
+      </div>
+
+      <div class="row"><span>Ara</span><b id="araToplam" class="mono">0.00 ₺</b></div>
+      <div class="row"><span>KDV (10%)</span><b id="kdv" class="mono">0.00 ₺</b></div>
+      <div class="row"><b>Toplam</b><b id="genelToplam" class="mono">0.00 ₺</b></div>
+
+      <div class="hr"></div>
+      
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" id="sepetTemizle">Sepeti Temizle</button>
+        <button class="btn orange" id="siparisGonderButonu" style="flex:1;">SİPARİŞİ GÖNDER</button>
+      </div>
+
+      <div style="margin-top:10px; border-top:1px solid #444; padding-top:10px;">
+          <button class="btn red" id="btnMisafirHesapIste" style="width:100%; font-weight:bold;">
+              HESABI İSTE / ÖDEME YAP
+          </button>
+          <small class="muted" style="display:block; text-align:center; margin-top:5px;">
+             Hesabı isteyince sepet sıfırlanır.
+          </small>
+      </div>
+      
+      <div class="hr"></div>
+      <h3>Rezervasyon</h3>
+      <div class="row">
+        <input id="rezAd" placeholder="Ad Soyad"/>
+        <input id="rezTelefon" placeholder="Telefon"/>
+        <input id="rezTarih" type="date"/>
+        <input id="rezSaat" type="time"/>
+         <select id="masaSeçimi">
+            <option value="Masa 1">Masa 1</option>
+            <option value="Masa 2">Masa 2</option>
+            <option value="Masa 3">Masa 3</option>
+            <option value="Masa 4">Masa 4</option>
+            <option value="Masa 5">Masa 5</option>
+            <option value="Masa 6">Masa 6</option>
+            <option value="Masa 7">Masa 7</option>
+        </select>
+      </div>
+      <div class="row">
+        <button class="btn orange" id="butonMisafirRezervasyon">Rezervasyon Oluştur</button>
+      </div>
+    </div>
+  </section>
+  
+  <section id="garson" class="grid g3" style="display:none; margin-top:14px;">
+    
+    <div class="panel">
+      <div class="sticky"><h3>Masa Durumları</h3></div>
+      <div class="list" id="garsonMasaListesi" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
+      
+      <div class="hr"></div>
+      
+      <div class="sticky" style="background: rgba(221, 107, 32, 0.2); border-left: 4px solid #ed8936; padding-left:10px;">
+          <h3 style="color:#f6ad55; margin:0;">Rezervasyonlar</h3>
+      </div>
+      
+      <div style="margin-top:10px;">
+          <div style="background: rgba(237, 137, 54, 0.1); border: 1px dashed #ed8936; padding:8px; border-radius:8px; margin-bottom:10px;">
+              <h6 style="color:#ed8936; font-weight:bold; font-size:0.85rem; margin-bottom:5px;">⏳ Bekleyen Talepler</h6>
+              <div class="list" id="garsonRezervasyonTalepListesi" style="min-height: 40px;">
+                  <div class="row muted" style="justify-content:center; font-size:0.8rem;">Talep Yok</div>
+              </div>
+          </div>
+          <div style="background: rgba(72, 187, 120, 0.1); border: 1px solid #48bb78; padding:8px; border-radius:8px;">
+              <h6 style="color:#48bb78; font-weight:bold; font-size:0.85rem; margin-bottom:5px;">✅ Onaylananlar</h6>
+              <div class="list" id="garsonAktifRezervasyonListesi" style="min-height: 40px;"></div>
+          </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="sticky" style="background: rgba(56, 161, 105, 0.2); border-left: 4px solid #48bb78; padding-left:10px;">
+          <h3 style="color:#68d391; margin:0;">Mutfak & Servis Akışı</h3>
+      </div>
+      <div style="padding:10px 0;">
+          <div class="login-sub" style="text-align:center; margin-bottom:10px;">Mutfaktan Çıkan / Hazır Yemekler</div>
+          <div id="garsonMutfakBildirimListesi" class="garson-siparis-grid" style="min-height: 100px;">
+              </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="sticky" style="background: rgba(229, 62, 62, 0.2); border-left: 4px solid #fc8181; padding-left:10px;">
+          <h3 style="color:#fc8181; margin:0; animation: flash 2s infinite;">Ödeme İstekleri</h3>
+      </div>
+      <div style="margin-top:10px;">
+          <small class="muted" style="display:block; margin-bottom:5px;">Hesap İsteyen Masalar</small>
+          <div class="list" id="garsonOdemeIstekListesi" style="min-height: 100px; background:rgba(0,0,0,0.2); padding:5px; border-radius:5px;">
+              <div class="row muted" style="justify-content:center; font-size:0.9rem;">Bekleyen yok.</div>
+          </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="sticky" style="background: #2d3748; border-left: 4px solid #63b3ed; padding-left:10px;">
+          <h3 style="color:#63b3ed; margin:0;">Kasa & Adisyon</h3>
+      </div>
+      
+      <div style="background:#1a202c; padding:10px; border-radius:8px; margin-top:10px; margin-bottom:10px; text-align:center;">
+         <b id="garsonSeciliMasaBaslik" style="display:block; font-size:1.1rem; color:#fff;">Masa Seçilmedi</b>
+         <small class="muted">Ödeme almak için istek listesinden masa seçin.</small>
+      </div>
+
+      <div class="hr"></div>
+      <div class="sticky"><h3>Adisyon Detayı</h3></div>
+      <div class="list" id="garsonSepetListesi" style="max-height: 300px; overflow-y:auto; min-height:100px;"></div>
+      
+      <div class="hr"></div>
+      <div class="row"><b>Toplam</b><b id="garsonToplamTutar" class="mono">0.00 ₺</b></div>
+      <div class="hr"></div>
+      
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <label class="muted" style="margin-bottom:-5px;">Ödeme İşlemi</label>
+        <div style="display:flex; gap:5px;">
+           <select id="garsonOdemeTuru" style="flex:1;">
+              <option value="nakit">Nakit</option>
+              <option value="pos">Kredi Kartı</option>
+              <option value="online">Online</option>
+           </select>
+           <button class="btn red" id="btnGarsonHesapKapat" style="flex:1;">Ödemeyi Al & Kapat</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="mutfak" class="grid g3" style="display:none; margin-top:14px;">
+    
+    <div class="panel" style="padding:0; overflow:hidden;">
+      <div class="k-header kh-red">
+        🔔 Sipariş Gelen (<span id="count-bekleyen">0</span>)
+      </div>
+      <div class="list" id="mutfakBekleyenListesi" style="padding:10px; min-height:300px;">
+        </div>
+    </div>
+
+    <div class="panel" style="padding:0; overflow:hidden;">
+      <div class="k-header kh-orange">
+        🔥 Hazırlanıyor (<span id="count-hazirlaniyor">0</span>)
+      </div>
+      <div class="list" id="mutfakHazirlaniyorListesi" style="padding:10px; min-height:300px;">
+        </div>
+    </div>
+
+    <div class="panel" style="padding:0; overflow:hidden;">
+      <div class="k-header kh-green">
+        ✅ Tamamlandı / Servis (<span id="count-tamamlanan">0</span>)
+      </div>
+      <div class="list" id="mutfakTamamlananListesi" style="padding:10px; min-height:300px;">
+        </div>
+    </div>
+
+  </section>
+
+</div>
+
+<div class="toast" id="bildirimToast"></div>
+
+<div class="modal fade" id="girisModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background-color: #1f2937; color: white; border: 1px solid #374151;">
+      <div class="modal-header" style="border-bottom: 1px solid #374151;">
+        <h5 class="modal-title" id="modalBaslik">Giriş Yap</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="modalKadi" class="form-label">Kullanıcı Adı</label>
+          <input type="text" class="form-control" id="modalKadi" style="background-color: #374151; color: white; border:none;">
+        </div>
+        <div class="mb-3">
+          <label for="modalSifre" class="form-label">Şifre</label>
+          <input type="password" class="form-control" id="modalSifre" style="background-color: #374151; color: white; border:none;">
+        </div>
+        <input type="hidden" id="hedefRol"> 
+      </div>
+      <div class="modal-footer" style="border-top: 1px solid #374151;">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+        <button type="button" class="btn btn-warning" id="modalGirisYapButonu">Giriş Yap</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/proje.js"></script>
+</body>
+</html>

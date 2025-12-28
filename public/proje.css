@@ -1,0 +1,374 @@
+:root{
+  --bg:#0b0502;        
+  --panel:#1b1009;      
+  --panel2:#20100a;     
+  --text:#fff7e6;       
+  --muted:#facc6b;       
+  --border:#f97316;      
+  --green:#22c55e;       
+  --orange:#fb923c;      
+  --blue:#38bdf8;        
+  --red:#f97373;        
+  --r:14px;
+  --sh:0 20px 45px rgba(0,0,0,.8);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial;
+  color:var(--text);
+  background:
+    radial-gradient(130% 180% at 0% 0%, #3b0f0f 0%, transparent 55%),
+    radial-gradient(120% 160% at 100% 0%, #7c2d12 0%, transparent 55%),
+    radial-gradient(180% 260% at 50% 120%, #111827 0%, #020617 60%);
+}
+h1,h2,h3{margin:.25rem 0 .6rem}
+small,.muted{color:var(--muted)}
+.mono{font-family:ui-monospace,Consolas,monospace}
+button,input,select,textarea{font-family:inherit}
+
+#girisEkrani{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+
+.login-inner{
+  max-width:1100px; 
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr)); 
+  gap:18px;
+}
+.login-card{
+  background:
+    radial-gradient(circle at 0% 0%, rgba(248,113,113,.35), transparent 55%),
+    radial-gradient(circle at 100% 100%, rgba(234,88,12,.35), transparent 55%),
+    #1b1009;
+  border-radius:18px;
+  border:1px solid rgba(248,113,113,.9);
+  box-shadow:var(--sh);
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.login-card:nth-child(2){
+  background:
+    radial-gradient(circle at 100% 0%, rgba(250,204,21,.35), transparent 55%),
+    radial-gradient(circle at 0% 100%, rgba(248,113,113,.25), transparent 55%),
+    #22110b;
+}
+.login-title{font-size:1.1rem;font-weight:700}
+.login-sub{font-size:.85rem;color:var(--muted)}
+.login-actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.badge-soft{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:3px 8px;
+  border-radius:999px;
+  border:1px solid rgba(250,204,21,.8);
+  background:rgba(34,19,5,.95);
+  font-size:.75rem;
+  color:#fde68a;
+}
+.badge-soft span{font-size:.7rem;opacity:.8}
+
+.app{
+  max-width:1320px;
+  margin:22px auto;
+  padding:0 14px;
+  display:none;
+}
+.bar{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  justify-content:space-between;
+  background:
+    linear-gradient(120deg,#b91c1c,#ea580c,#facc15);
+  border:1px solid #f97316;
+  border-radius:var(--r);
+  padding:10px 12px;
+  box-shadow:var(--sh);
+  position:sticky;
+  top:10px;
+  z-index:10;
+  backdrop-filter:blur(12px);
+  color:#fffbeb;
+}
+.pill{
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(254,243,199,.35);
+  background:rgba(23,15,8,.9);
+  color:#fed7aa;
+  font-size:.8rem;
+}
+.grid{display:grid;gap:14px}
+.g3{grid-template-columns:1.2fr 1.4fr 1fr}
+
+.panel{
+  background:
+    radial-gradient(circle at 0% 0%, rgba(248,113,113,.16), transparent 55%),
+    radial-gradient(circle at 100% 0%, rgba(250,204,21,.18), transparent 60%),
+    #1b1009;
+  border:1px solid #f97316;
+  border-radius:var(--r);
+  box-shadow:var(--sh);
+  padding:12px;
+  min-height:220px;
+}
+.list{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  max-height:460px;
+  overflow:auto;
+}
+.row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:8px 10px;
+  border:1px solid rgba(55,30,15,.9);
+  background:rgba(15,11,6,.95);
+  border-radius:10px;
+}
+.row:hover{
+  background:linear-gradient(90deg,#451a03,#7c2d12);
+}
+.btn{
+  padding:7px 11px;
+  border-radius:999px;
+  border:1px solid #f97316;
+  background:#18181b;
+  color:#fed7aa;
+  cursor:pointer;
+  font-size:.8rem;
+  font-weight:600;
+  transition:transform .1s ease, box-shadow .1s ease, background .15s ease;
+}
+.btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 10px 25px rgba(0,0,0,.7);
+}
+.btn.green{
+  background:linear-gradient(135deg,#166534,#22c55e);
+  border-color:#16a34a;
+  color:#ecfdf5;
+}
+.btn.blue{
+  background:linear-gradient(135deg,#1d4ed8,#38bdf8);
+  border-color:#38bdf8;
+  color:#eff6ff;
+}
+.btn.orange{
+  background:linear-gradient(135deg,#ea580c,#f97316);
+  border-color:#fb923c;
+  color:#fffbeb;
+}
+.btn.red{
+  background:linear-gradient(135deg,#b91c1c,#ef4444);
+  border-color:#f87171;
+  color:#fef2f2;
+}
+
+input,select,textarea{
+  background:#020617;
+  border:1px solid #4b5563;
+  border-radius:999px;
+  color:#f9fafb;
+  padding:8px 11px;
+  font-size:.86rem;
+}
+textarea{border-radius:14px}
+input[type=number]{width:90px}
+input::placeholder,textarea::placeholder{
+  color:#9ca3af;
+}
+.hr{height:1px;background:#4b5563;margin:10px 0}
+
+.sticky{
+  position:sticky;
+  top:0;
+  background:linear-gradient(180deg,#111827,#020617);
+  padding:6px 8px;
+  border-bottom:1px solid #4b5563;
+  border-radius:12px 12px 0 0;
+  margin:-12px -12px 12px;
+  z-index: 5;
+}
+
+.toast{
+  position:fixed;
+  right:16px;
+  top:16px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  z-index:9999;
+}
+.toast .t{
+  background:#0b1120;
+  border:1px solid #f97316;
+  padding:10px 12px;
+  border-radius:12px;
+  box-shadow:var(--sh);
+  color:#fee2e2;
+}
+
+@media (max-width:900px){
+  .g3{grid-template-columns:1fr}
+  .login-inner{grid-template-columns:1fr}
+  .bar{flex-direction:column;align-items:flex-start}
+}
+
+.row .btn {
+  font-size: 1.1rem;    
+  padding: 0;             
+  min-width: 24px;        
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+#butonMisafirRezervasyon {
+  min-width: auto;
+  min-height: auto;
+  padding: 8px 18px;     
+  font-size: 0.9rem;     
+  white-space: nowrap;   
+}
+
+/* --- YENİ EKLENEN MUTFAK TASARIMI --- */
+
+/* Mutfak Kolon Başlıkları */
+.k-header {
+  padding: 12px;
+  border-radius: 8px 8px 0 0;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.kh-red { background: linear-gradient(45deg, #7f1d1d, #ef4444); color: white; }
+.kh-orange { background: linear-gradient(45deg, #7c2d12, #f97316); color: white; }
+.kh-green { background: linear-gradient(45deg, #14532d, #22c55e); color: white; }
+
+/* Mutfak Sipariş Kartı */
+.k-card {
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-left-width: 4px;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.k-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px rgba(0,0,0,0.5);
+}
+
+/* Duruma Göre Kart Renkleri */
+.kc-red { border-left-color: #ef4444; }
+.kc-orange { border-left-color: #f97316; }
+.kc-green { border-left-color: #22c55e; }
+
+/* Kart İçeriği */
+.k-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 6px;
+}
+
+.k-masa { font-weight: bold; font-size: 1.1rem; color: #fff; }
+.k-saat { font-size: 0.8rem; color: #9ca3af; font-family: monospace; }
+
+.k-urunler {
+  font-size: 0.9rem;
+  color: #e5e7eb;
+  line-height: 1.5;
+}
+
+.k-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+/* Ufak Animasyon */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slide { animation: slideIn 0.3s ease-out forwards; }
+
+/* --- GARSON EKRANI İÇİN YENİ KART TASARIMI --- */
+.garson-siparis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+    padding: 10px 0;
+}
+
+.garson-card {
+    background: #1b1009; /* Panel rengi */
+    border: 1px solid #22c55e; /* Yeşil çerçeve (Hazır) */
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s;
+    animation: slideIn 0.4s ease-out;
+}
+
+.garson-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.2);
+}
+
+.garson-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed rgba(255,255,255,0.2);
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+}
+
+.garson-card-title {
+    font-weight: bold;
+    color: #22c55e;
+    font-size: 1.1rem;
+}
+
+.garson-card-status {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
